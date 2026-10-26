@@ -30,8 +30,8 @@ export default defineConfig({
       exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'src/main.tsx', 'src/types.ts', 'src/vite-env.d.ts'],
       reporter: ['text-summary', 'html', 'json-summary'],
       // 지금 수치보다 조금 낮게 둔 하한 — 테스트 없이 코드만 늘면 CI 가 실패한다(테스트를 늘리면 함께 올린다).
-      // 화면 단위(pages/*)는 Playwright E2E 가 실제 브라우저로 확인하므로 여기 수치에는 잡히지 않는다.
-      thresholds: { lines: 55, statements: 54, branches: 55, functions: 43 },
+      // 0% 로 남는 App.tsx(라우팅)·api/index.ts(요청 정의, 단위 테스트에서는 가짜로 대체)는 Playwright E2E 가 확인한다.
+      thresholds: { lines: 76, statements: 75, branches: 77, functions: 64 },
     },
   },
 });
