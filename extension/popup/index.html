@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HireTrack</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand"><span class="mark">H</span>HireTrack</div>
+      <div class="top-right">
+        <span id="who" class="muted"></span>
+        <button id="logout" class="link" hidden>로그아웃</button>
+      </div>
+    </header>
+
+    <!-- 로그인 -->
+    <section id="login-view" hidden>
+      <p class="muted">HireTrack 계정으로 로그인하면 보고 있는 공고를 바로 저장할 수 있어요.</p>
+      <form id="login-form">
+        <label>이메일<input name="email" type="email" required autocomplete="email" /></label>
+        <label>비밀번호<input name="password" type="password" required autocomplete="current-password" /></label>
+        <button type="submit" class="primary">로그인</button>
+      </form>
+    </section>
+
+    <!-- 추출 → 확인·수정 → 저장 -->
+    <section id="main-view" hidden>
+      <div id="status" class="status" role="status"></div>
+      <form id="posting-form" hidden>
+        <label data-field="company">회사명 *<input name="company" required maxlength="100" /></label>
+        <label data-field="title">직무명 *<input name="title" required maxlength="200" /></label>
+        <div class="row">
+          <label data-field="location">근무지<input name="location" maxlength="100" /></label>
+          <label data-field="employmentType"
+            >고용형태
+            <select name="employmentType">
+              <option value="FULL_TIME">정규직</option>
+              <option value="FREELANCE">프리랜서</option>
+              <option value="OTHER">기타</option>
+            </select>
+          </label>
+        </div>
+        <label data-field="deadline">마감일<input name="deadline" type="date" /></label>
+        <label data-field="requirements">자격요건<textarea name="requirements" rows="3" maxlength="5000"></textarea></label>
+        <label>공고 URL<input name="url" readonly /></label>
+        <button type="submit" class="primary" id="save">저장</button>
+      </form>
+      <div id="saved" class="saved" hidden></div>
+    </section>
+
+    <details class="settings">
+      <summary>서버 설정</summary>
+      <form id="settings-form">
+        <label>API 주소<input name="apiUrl" required placeholder="https://hiretrack.example.com" /></label>
+        <label>앱 주소 (보드 링크)<input name="appUrl" required /></label>
+        <button type="submit">저장</button>
+      </form>
+    </details>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

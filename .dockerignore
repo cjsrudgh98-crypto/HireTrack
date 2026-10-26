@@ -1,0 +1,11 @@
+target
+data
+frontend
+extension
+deploy
+docs
+.idea
+.git
+.github
+*.iml
+*.bak

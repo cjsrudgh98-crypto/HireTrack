@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:hiretrack-test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      # 운영과 같이 Flyway 로 스키마를 만들고 엔티티와 일치하는지 검증 — 마이그레이션 누락을 테스트에서 잡는다
+      ddl-auto: validate
+    open-in-view: false
+
+parse:
+  timeout: 5s
+  max-body-size: 2MB
+  rate-limit-per-minute: 3
+
+notification:
+  base-url: http://localhost:5173
+  mail-from: test@hiretrack.local
+  scheduler-enabled: false
+
+jwt:
+  secret: test-secret-test-secret-test-secret-0123456789
+  access-token-validity: 1h
+  extension-token-validity: 30d
+
+app:
+  cors:
+    allowed-origin-patterns: chrome-extension://*
+
+sentry:
+  dsn: ""

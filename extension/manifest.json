@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "HireTrack — 공고 저장",
+  "short_name": "HireTrack",
+  "version": "1.0.0",
+  "description": "보고 있는 채용 공고를 버튼 한 번으로 HireTrack 보드에 저장합니다.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_title": "HireTrack에 공고 저장",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5wdt6554FXHQFgyDPFxuEMQ6AkMclKnXako5Vj8BctBMaUqQrk5PfVdKEKWQsjyjOxzXvoo4MWRO9djA6JMLN4dtn+4hT8oG8iwsaDTpgcEnRMC4PWIAaeP98e/ZzqbFEt/17Tb9TdnKlyZrrZbUYteTzEmvhAGnB4r2X8SSlbO8IWCh+zmQBDoFphU5Jh0tW1MWaLrFD6Ts+KIt8yPITy+rW5B2zJeuxzpVOQAvKFCIhIF9IWzsDFfOfsl2or5+FLawGEn6pzI9GY6UqL5uX4GZI/nUMArmjn4n/rQeKBButnOiKyTUy4eOKdzRLdVu6V0eso7SJwCDRzWnTRf2OQIDAQAB"
+}

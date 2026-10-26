@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!--
+  자바스크립트로 화면을 그리는 페이지: 본문은 비어 있고 JSON-LD 만 있는 경우.
+  사이트 전용 파서는 실패하고, JSON-LD 파서가 대신 채우는 흐름을 검증한다.
+-->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>잡코리아</title>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "JobPosting",
+      "title": "데이터 엔지니어",
+      "hiringOrganization": {"@type": "Organization", "name": "□□데이터"},
+      "employmentType": "FULL_TIME",
+      "validThrough": "2026-11-10T23:59:59+09:00",
+      "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressRegion": "서울", "addressLocality": "마포구"}}
+    }
+  </script>
+</head>
+<body>
+<div id="__next"></div>
+<script src="/_next/static/chunks/main.js"></script>
+</body>
+</html>

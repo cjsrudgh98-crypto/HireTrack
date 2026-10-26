@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>HireTrack 포트폴리오</title>
+<!-- PDF 원본. docs/portfolio/build-pdf.mjs 로 HireTrack-portfolio.pdf 를 만든다 -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --blue: #3758f9; --blue-dark: #0f1d5c; --blue-soft: #eef1ff; --ink: #111827; --ink-2: #4b5563; --ink-3: #6b7280;
+    --line: #e5e7eb; --teal: #0d9488; --amber: #b45309; --red: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 210mm; height: 297mm; padding: 18mm 17mm 16mm; position: relative; overflow: hidden; page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  .foot { position: absolute; left: 17mm; right: 17mm; bottom: 9mm; display: flex; justify-content: space-between;
+    font-size: 8.5pt; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 3mm; }
+  h2.sec { font-size: 20pt; margin: 0 0 1.5mm; letter-spacing: -0.5px; }
+  h2.sec small { display: block; font-size: 9pt; color: var(--blue); font-weight: 700; letter-spacing: 2px; margin-bottom: 1mm; }
+  .lead { color: var(--ink-2); font-size: 10.5pt; line-height: 1.7; margin: 0 0 6mm; }
+  h3 { font-size: 12.5pt; margin: 0 0 2mm; }
+  p, li { font-size: 9.8pt; line-height: 1.65; }
+  ul { margin: 0; padding-left: 4.5mm; }
+  .chip { display: inline-block; padding: 1mm 3mm; border-radius: 99px; background: var(--blue-soft); color: var(--blue-dark);
+    font-size: 8.8pt; font-weight: 500; margin: 0 1.2mm 1.5mm 0; }
+
+  /* 표지 */
+  .cover { padding: 0; background: linear-gradient(150deg, #0b1023 0%, #1d3bb8 58%, #3758f9 100%); color: #fff; }
+  .cover .inner { padding: 26mm 20mm 0; }
+  .cover .logo { display: flex; align-items: center; gap: 4mm; font-size: 13pt; font-weight: 700; opacity: .95; }
+  .cover .logo span { width: 12mm; height: 12mm; border-radius: 3mm; background: #fff; color: var(--blue); display: grid; place-items: center;
+    font: 900 20pt/1 Arial, sans-serif; }
+  .cover h1 { font-size: 52pt; margin: 16mm 0 3mm; letter-spacing: -2px; font-weight: 900; }
+  .cover .tag { font-size: 16pt; font-weight: 500; line-height: 1.5; margin: 0 0 9mm; }
+  .cover .meta { display: grid; grid-template-columns: 28mm 1fr; row-gap: 2.2mm; font-size: 10.5pt; max-width: 160mm; margin: 0; }
+  .cover .meta dt { opacity: .7; } .cover .meta dd { margin: 0; font-weight: 500; }
+  .cover .meta dd.me { font-weight: 700; }
+  .cover .shot { position: absolute; left: 20mm; right: 20mm; bottom: 18mm; border-radius: 4mm; overflow: hidden;
+    box-shadow: 0 10mm 25mm rgba(0,0,0,.35); border: 1.5mm solid rgba(255,255,255,.15); }
+  .cover .shot img { display: block; width: 100%; }
+
+  /* 개요 */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 0 0 7mm; }
+  .stat { background: var(--blue-soft); border-radius: 3mm; padding: 4mm; }
+  .stat b { display: block; font-size: 20pt; color: var(--blue-dark); letter-spacing: -0.5px; }
+  .stat span { font-size: 8.8pt; color: var(--ink-2); }
+  .flow { display: grid; grid-template-columns: 1fr 6mm 1fr 6mm 1fr 6mm 1fr; align-items: stretch; margin: 0 0 7mm; }
+  .flow .step { border: 1px solid var(--line); border-radius: 3mm; padding: 4mm; }
+  .flow .step em { font-style: normal; font-size: 8.5pt; font-weight: 700; color: var(--blue); letter-spacing: 1px; }
+  .flow .step h4 { margin: 1mm 0 1.5mm; font-size: 11.5pt; }
+  .flow .step p { margin: 0; font-size: 9pt; color: var(--ink-2); line-height: 1.55; }
+  .flow .arrow { display: flex; align-items: center; justify-content: center; color: var(--blue); font-weight: 700; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .box { border: 1px solid var(--line); border-radius: 3mm; padding: 4.5mm 5mm; }
+  .box h3 { display: flex; align-items: center; gap: 2mm; }
+  .box h3 i { font-style: normal; font-size: 13pt; }
+
+  /* 화면 */
+  .shots { display: grid; gap: 5mm; }
+  .shots.three { grid-template-columns: repeat(3, 1fr); }
+  .shots.two { grid-template-columns: repeat(2, 1fr); }
+  .shot-card figure { margin: 0; }
+  .shot-card img { width: 100%; display: block; border-radius: 3mm; border: 1px solid var(--line); box-shadow: 0 2mm 6mm rgba(0,0,0,.06); }
+  .shot-card figcaption { margin-top: 2.5mm; }
+  .shot-card figcaption b { display: block; font-size: 10.5pt; margin-bottom: .8mm; }
+  .shot-card figcaption span { font-size: 8.8pt; color: var(--ink-2); line-height: 1.55; display: block; }
+  .crop { height: 100mm; overflow: hidden; border-radius: 3mm; border: 1px solid var(--line); }
+  .crop img { border: 0; border-radius: 0; box-shadow: none; }
+  .wide img { width: 100%; }
+
+  /* 아키텍처 */
+  .arch { display: grid; grid-template-columns: 40mm 1fr 38mm; gap: 4mm; align-items: stretch; margin-bottom: 6mm; }
+  .tier { border-radius: 3mm; padding: 3.5mm; }
+  .tier h4 { margin: 0 0 2.5mm; font-size: 10.5pt; }
+  .tier .node { background: #fff; border: 1px solid var(--line); border-radius: 2mm; padding: 1.6mm 2.5mm; font-size: 8.6pt; margin-bottom: 1.8mm; line-height: 1.4; }
+  .tier .node b { display: block; font-size: 9.3pt; }
+  .tier.client { background: #f0fdfa; } .tier.server { background: var(--blue-soft); } .tier.ext { background: #fff7ed; }
+  .server-layers { display: grid; grid-template-columns: 1fr; gap: 1.8mm; }
+  .server-layers .node { margin: 0; }
+  .states { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5mm; font-size: 8.8pt; }
+  .states .s { padding: 1.2mm 2.5mm; border-radius: 2mm; background: #f3f4f6; font-weight: 500; }
+  .states .s.ok { background: var(--blue-soft); color: var(--blue-dark); }
+  .states .s.good { background: #ecfdf5; color: #065f46; }
+  .states .s.bad { background: #fef2f2; color: #991b1b; }
+  .states .a { color: var(--ink-3); }
+
+  /* 문제 해결 */
+  .case { border: 1px solid var(--line); border-radius: 3mm; padding: 4.5mm 5mm; margin-bottom: 4mm; break-inside: avoid; }
+  .case h3 { display: flex; gap: 2.5mm; align-items: baseline; }
+  .case h3 .n { color: var(--blue); font-weight: 900; font-size: 13pt; }
+  .case .psr { display: grid; grid-template-columns: 15mm 1fr; row-gap: 1.3mm; column-gap: 3mm; margin: 0; }
+  .case .psr dt { font-size: 8.5pt; font-weight: 700; padding: .8mm 0; text-align: center; border-radius: 1.5mm; height: fit-content; }
+  .case .psr dt.p { background: #fef2f2; color: #991b1b; }
+  .case .psr dt.s { background: var(--blue-soft); color: var(--blue-dark); }
+  .case .psr dt.r { background: #ecfdf5; color: #065f46; }
+  .case .psr dd { margin: 0; font-size: 9.3pt; line-height: 1.6; }
+  code { font-family: 'Consolas', monospace; font-size: 8.6pt; background: #f3f4f6; padding: .2mm 1.2mm; border-radius: 1mm; }
+
+  table.t { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  table.t th, table.t td { text-align: left; padding: 2.2mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.55; }
+  table.t th { width: 30mm; color: var(--ink-2); font-weight: 700; background: #f9fafb; }
+  .qr { display: flex; gap: 5mm; align-items: center; background: var(--blue-soft); border-radius: 3mm; padding: 5mm; margin-top: 6mm; }
+  .qr b { font-size: 11pt; } .qr p { margin: 1mm 0 0; }
+</style>
+</head>
+<body>
+
+<!-- 1. 표지 -->
+<section class="page cover">
+  <div class="inner">
+    <div class="logo"><span>H</span>HireTrack</div>
+    <h1>HireTrack</h1>
+    <p class="tag">흩어진 채용 공고·지원 현황·자기소개서를 한곳에 모으고,<br />"나는 어느 단계에서 떨어지는지"를 숫자로 보여주는 지원 관리 트래커</p>
+    <dl class="meta">
+      <dt>개발자</dt><dd class="me">천경호</dd>
+      <dt>연락처</dt><dd>010-7757-5062</dd>
+      <dt>이메일</dt><dd>cjsrudgh98@gmail.com</dd>
+      <dt>구분</dt><dd>개인 프로젝트 · 1인 풀스택 (기획 · 백엔드 · 프론트엔드 · 확장 프로그램 · 배포)</dd>
+      <dt>Backend</dt><dd>Java 25 · Spring Boot 4.0 · Spring Security(JWT) · JPA · Flyway</dd>
+      <dt>Frontend</dt><dd>React 19 · TypeScript · Vite · TanStack Query · Chrome Extension MV3</dd>
+      <dt>Infra</dt><dd>PostgreSQL · Docker Compose · Nginx · GitHub Actions · GHCR</dd>
+      <dt>GitHub</dt><dd>github.com/cjsrudgh98-crypto/HireTrack</dd>
+    </dl>
+  </div>
+  <div class="shot"><img src="../screenshots/board.png" alt="" /></div>
+</section>
+
+<!-- 2. 개요 -->
+<section class="page">
+  <h2 class="sec"><small>OVERVIEW</small>프로젝트 개요</h2>
+  <p class="lead">
+    취업 준비를 하면서 지원 현황을 스프레드시트·메모장·북마크에 나눠 적다 보니, 마감을 놓치고 어느 회사에 어떤 자소서를 냈는지 헷갈리는 일이 반복됐습니다.
+    HireTrack은 <b>공고 수집 → 지원 상태 관리 → 자기소개서 작성 → 결과 분석</b>을 한 흐름으로 묶었습니다.
+    웹앱 · API 서버 · 크롬 확장 프로그램 · 캘린더 피드로 구성되고, 배포·백업·복구까지 실제 운영을 전제로 만들었습니다.
+  </p>
+
+  <div class="stats">
+    <div class="stat"><b>44</b><span>REST API 엔드포인트</span></div>
+    <div class="stat"><b>180</b><span>자동 테스트 (백 166 · 프론트 10 · E2E 4)</span></div>
+    <div class="stat"><b>91.9%</b><span>백엔드 라인 커버리지 (JaCoCo)</span></div>
+    <div class="stat"><b>4개</b><span>구성 (웹 · API · 확장 · 캘린더)</span></div>
+  </div>
+
+  <div class="flow">
+    <div class="step"><em>01 COLLECT</em><h4>공고 수집</h4><p>URL 자동 추출 또는 크롬 확장으로 보고 있는 페이지에서 바로</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><em>02 TRACK</em><h4>지원 관리</h4><p>칸반 드래그로 상태 변경, 이력 기록, 마감 D-day · 면접 일정</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><em>03 WRITE</em><h4>자소서</h4><p>버전 관리 · 비교, 지원 순간 제출본 고정, 답변 라이브러리</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><em>04 ANALYZE</em><h4>통계</h4><p>도달 단계 기준 퍼널, 주간 추이, 응답 기간, 조건별 통과율</p></div>
+  </div>
+
+  <div class="grid2">
+    <div class="box">
+      <h3><i>🗂</i>지원 관리</h3>
+      <ul>
+        <li>칸반 보드: 드래그로 상태 변경 (낙관적 업데이트, 실패 시 롤백)</li>
+        <li>모든 상태 변경을 이력으로 기록, 10분 안에 되돌린 변경은 "실수"로 표시</li>
+        <li>마감 D-day, 지난 공고 흐리게, 다가오는 면접 줄</li>
+        <li>회사·직무 검색, 고용형태·지역 필터, 공고별 메모</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3><i>✍️</i>자기소개서</h3>
+      <ul>
+        <li>자동 임시저장 + 버전 저장 (append-only), 문자 단위 비교</li>
+        <li>처음 지원하는 순간 답변을 제출본으로 고정 → 면접 준비 때 확인</li>
+        <li>글자 수 3종 (공백 포함·제외·byte), 문항 유형별 템플릿</li>
+        <li>과거 답변 검색, 새 문항에 맞는 템플릿 추천·가져오기</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3><i>🔗</i>공고 수집</h3>
+      <ul>
+        <li>URL → 서버가 1회 요청해 추출: 사람인 · 잡코리아 · JSON-LD · Open Graph</li>
+        <li>크롬 확장(MV3): 렌더링된 HTML 을 같은 파서 체인으로</li>
+        <li>SSRF 차단, 시간·크기 제한, 사용자별 요청 제한, 파서 실패율 지표</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3><i>📊</i>통계 · 알림</h3>
+      <ul>
+        <li>"현재 상태"가 아닌 "도달한 단계" 기준 퍼널 · 통과율</li>
+        <li>주간 지원 추이, 첫 결과까지 걸린 기간, 고용형태·지역·템플릿별 통과율</li>
+        <li>마감 임박 메일 (사용자별 하루 1통), iCal 캘린더 구독 (면접 1시간 전 알림)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>HireTrack · 포트폴리오</span><span>2</span></div>
+</section>
+
+<!-- 3. 화면 1 -->
+<section class="page">
+  <h2 class="sec"><small>SCREENS</small>주요 화면 · 지원 관리와 자기소개서</h2>
+  <p class="lead">데스크톱 · 모바일 반응형이고, 운영체제 설정에 따라 다크 모드로 바뀝니다.</p>
+  <div class="shot-card">
+    <figure><div class="crop" style="height:118mm"><img src="../screenshots/essay.png" alt="" /></div>
+      <figcaption><b>자기소개서 작성</b><span>왼쪽 문항 목록, 가운데 편집기(자동 임시저장 · 글자 수 3종), 오른쪽 버전 목록과 비교. 편집 중인 내용과 최신 버전의 차이를 문자 단위로 보여주고, 아래에서 같은 유형의 템플릿을 추천합니다.</span></figcaption></figure>
+  </div>
+  <div class="shots two shot-card" style="margin-top:6mm">
+    <figure><div class="crop" style="height:52mm"><img src="../screenshots/essay-submitted.png" alt="" /></div>
+      <figcaption><b>제출본 고정</b><span>처음 "지원 완료"로 바꾸는 순간의 답변이 제출본(v2)으로 잠깁니다. 면접 전에 무엇을 냈는지 그대로 확인할 수 있어요.</span></figcaption></figure>
+    <figure><div class="crop" style="height:52mm"><img src="../screenshots/history.png" alt="" /></div>
+      <figcaption><b>상태 변경 이력</b><span>모든 변경이 남고, 10분 안에 그대로 되돌린 변경은 취소선으로 표시되어 통계에서 빠집니다.</span></figcaption></figure>
+  </div>
+  <div class="foot"><span>HireTrack · 포트폴리오</span><span>3</span></div>
+</section>
+
+<!-- 4. 화면 2 -->
+<section class="page">
+  <h2 class="sec"><small>SCREENS</small>주요 화면 · 통계 · 확장 프로그램 · 모바일</h2>
+  <p class="lead">통계는 "결과가 나온 건"만 분모에 넣고, 결과를 기다리는 건은 따로 보여줍니다.</p>
+  <div class="shot-card">
+    <figure><div class="crop" style="height:86mm"><img src="../screenshots/dashboard.png" alt="" /></div>
+      <figcaption><b>지원 통계</b><span>지원 퍼널(각 단계에 한 번이라도 도달한 공고 수), 최근 12주 주간 지원 추이, 첫 결과까지 걸린 기간 분포, 고용형태·지역·템플릿별 서류 통과율. 모든 차트에 "표로 보기"가 있습니다.</span></figcaption></figure>
+  </div>
+  <div class="shots three shot-card" style="margin-top:6mm">
+    <figure><div class="crop" style="height:58mm"><img src="../screenshots/extension-popup.png" alt="" /></div>
+      <figcaption><b>크롬 확장 프로그램</b><span>아이콘을 누른 탭의 HTML 을 서버 파서가 처리해 폼을 채웁니다.</span></figcaption></figure>
+    <figure><div class="crop" style="height:58mm"><img src="../screenshots/mobile-board.png" alt="" /></div>
+      <figcaption><b>모바일 보드</b><span>컬럼을 옆으로 넘겨 보고, 페이지 자체는 가로로 넘치지 않게 E2E 로 검사합니다.</span></figcaption></figure>
+    <figure><div class="crop" style="height:58mm"><img src="../screenshots/dashboard-dark.png" alt="" /></div>
+      <figcaption><b>다크 모드</b><span>색은 모두 토큰으로 정의해 라이트·다크에서 같은 대비를 유지합니다.</span></figcaption></figure>
+  </div>
+  <div class="qr">
+    <div style="font-size:26pt">▶</div>
+    <div>
+      <b>시연 영상 (1분 16초)</b>
+      <p>보드 → 공고 등록 → 드래그로 상태 변경 → 자소서 버전 저장 · 비교 → 제출본 고정 → 면접 일정 → 통계 → 답변 검색 → 확장 프로그램 → 알림 · 캘린더 → 모바일</p>
+      <p><code>github.com/cjsrudgh98-crypto/HireTrack/blob/main/docs/demo/HireTrack-demo.mp4</code></p>
+    </div>
+  </div>
+  <div class="foot"><span>HireTrack · 포트폴리오</span><span>4</span></div>
+</section>
+
+<!-- 5. 아키텍처 -->
+<section class="page">
+  <h2 class="sec"><small>ARCHITECTURE</small>시스템 구조</h2>
+  <p class="lead">서버 1대에 Docker Compose 로 Nginx · Spring Boot · PostgreSQL 을 띄웁니다. 웹앱은 같은 출처로, 확장 프로그램은 고정된 확장 ID 하나만 CORS 로 허용하고, 캘린더 앱은 URL 의 비밀 토큰으로 구독합니다.</p>
+  <div class="arch">
+    <div class="tier client">
+      <h4>Client</h4>
+      <div class="node"><b>React 19 SPA</b>TypeScript · Vite<br />TanStack Query · dnd-kit</div>
+      <div class="node"><b>Chrome 확장 MV3</b>activeTab · 범위 제한 토큰</div>
+      <div class="node"><b>캘린더 앱</b>구글 · 애플 · 아웃룩 (iCal)</div>
+      <div class="node"><b>업타임 모니터</b><code>/health</code></div>
+    </div>
+    <div class="tier server">
+      <h4>서버 (Docker Compose)</h4>
+      <div class="server-layers">
+        <div class="node"><b>Nginx</b>HTTPS(Let's Encrypt) · 정적 파일 · 보안 헤더 · <code>/api</code> 프록시 · <code>/health</code> 만 Actuator 로</div>
+        <div class="node"><b>Security Filter Chain</b>JWT(APP / EXTENSION 범위) · 요청 크기 제한 · CORS · JSON 401/403</div>
+        <div class="node"><b>Controller · Service</b>공고 · 상태 이력 · 파서 체인 · 자소서 버전 · 템플릿 · 통계 · 면접 · 캘린더 · 알림 — 44개 엔드포인트</div>
+        <div class="node"><b>도메인 이벤트</b>첫 지원 → 제출본 고정 · 공고 삭제 → 자소서·면접 정리 (같은 트랜잭션)</div>
+        <div class="node"><b>Scheduler · Metrics</b>마감 알림 메일 · Micrometer 지표(파서 실패율, 알림 결과) · Sentry(선택)</div>
+        <div class="node"><b>PostgreSQL 17</b>Flyway V1~V4, <code>ddl-auto: validate</code> · 로컬은 H2 PostgreSQL 모드</div>
+      </div>
+    </div>
+    <div class="tier ext">
+      <h4>External</h4>
+      <div class="node"><b>채용 사이트</b>사용자가 넣은 URL 만 1회 요청</div>
+      <div class="node"><b>SMTP</b>마감 임박 메일</div>
+      <div class="node"><b>GHCR</b>이미지 저장소</div>
+      <div class="node"><b>GitHub Actions</b>CI · SSH 배포 · 롤백</div>
+    </div>
+  </div>
+
+  <h3>지원 상태 흐름</h3>
+  <div class="states" style="margin:2mm 0 5mm">
+    <span class="s">관심</span><span class="a">→</span><span class="s ok">지원 완료</span><span class="a">→</span>
+    <span class="s ok">서류 합격</span><span class="a">→</span><span class="s ok">면접</span><span class="a">→</span><span class="s good">최종 합격</span>
+    <span class="a">·</span><span class="s bad">불합격 (어느 단계에서든)</span>
+  </div>
+
+  <h3>기술 스택</h3>
+  <table class="t">
+    <tr><th>Backend</th><td>Java 25, Spring Boot 4.0 (Web, Data JPA, Security, Validation, Mail, Actuator), jjwt, Jsoup, Micrometer, springdoc-openapi, Sentry</td></tr>
+    <tr><th>Frontend</th><td>React 19, TypeScript, Vite 8, TanStack Query, React Router, dnd-kit, Recharts, diff-match-patch · 확장 프로그램은 Chrome MV3 순수 JS</td></tr>
+    <tr><th>Database</th><td>PostgreSQL 17 (운영 · 통합 테스트), H2 PostgreSQL 모드 (로컬), Flyway</td></tr>
+    <tr><th>Test</th><td>JUnit 5, Mockito, MockMvc, Testcontainers, JaCoCo, Vitest, Testing Library, Playwright</td></tr>
+    <tr><th>DevOps</th><td>Docker 멀티 스테이지, Docker Compose, Nginx, Let's Encrypt, GitHub Actions, GHCR, 백업·복구 스크립트</td></tr>
+  </table>
+  <div class="foot"><span>HireTrack · 포트폴리오</span><span>5</span></div>
+</section>
+
+<!-- 6. 문제 해결 1 -->
+<section class="page">
+  <h2 class="sec"><small>PROBLEM SOLVING</small>기술적 도전과 해결</h2>
+  <p class="lead">기능이 "돌아가는" 데서 멈추지 않고, 동시 요청 · 운영 DB · 보안처럼 실제로 쓰면 깨지는 지점을 테스트로 재현하고 막았습니다.</p>
+
+  <div class="case">
+    <h3><span class="n">01</span>동시 상태 변경으로 이력이 끊기는 문제</h3>
+    <dl class="psr">
+      <dt class="p">문제</dt><dd>같은 공고에 상태 변경 4건을 동시에 보내면 모두 같은 "이전 상태"를 읽어 이력이 전부 <code>관심 → X</code>로 기록됨. 통계가 이 이력으로 계산되므로 숫자가 틀어짐 (빠른 연속 드래그, 웹·확장 동시 사용)</dd>
+      <dt class="s">해결</dt><dd>상태 변경 때 공고 행을 <code>SELECT … FOR UPDATE</code> 로 잠가 한 줄로 세움. 처음엔 H2 에서만 통과 — PostgreSQL 은 잠금 대기 뒤 <b>잠근 행만 최신 값으로 다시 읽고 조인한 행은 옛 값</b>을 쓰기 때문. 잠금 쿼리에서 join fetch 를 빼고 잠금 후 따로 읽도록 수정</dd>
+      <dt class="r">결과</dt><dd>4개 스레드 동시 변경 테스트를 H2 · PostgreSQL 양쪽에서 실행, 이력 체인 끊김 0건 (수정 전 5회 중 5회)</dd>
+    </dl>
+  </div>
+
+  <div class="case">
+    <h3><span class="n">02</span>URL 추출 기능의 SSRF</h3>
+    <dl class="psr">
+      <dt class="p">문제</dt><dd>사용자가 넣은 URL 로 서버가 요청을 보내므로, <code>localhost</code> · 사설망 · 클라우드 메타데이터(169.254.169.254) 같은 내부 주소를 찌를 수 있음</dd>
+      <dt class="s">해결</dt><dd>http/https · 80/443 만 허용, userinfo 거부, DNS 결과 IP <b>전부</b> 검사(IPv4-mapped IPv6 · NAT64 포함), 자동 리다이렉트를 끄고 hop 마다 재검사. 시간·본문 크기 제한, 사용자별 분당 요청 제한</dd>
+      <dt class="r">결과</dt><dd>로컬 HTTP 서버로 리다이렉트 우회까지 테스트 · <code>0x7f000001</code>, <code>2130706433</code> 같은 표기도 차단</dd>
+    </dl>
+  </div>
+
+  <div class="case">
+    <h3><span class="n">03</span>자소서 버전 동시 저장</h3>
+    <dl class="psr">
+      <dt class="p">문제</dt><dd>두 탭에서 같은 문항을 동시에 저장하면 같은 버전 번호가 두 번 생기거나, 다른 탭의 내용을 모른 채 덮어씀</dd>
+      <dt class="s">해결</dt><dd>클라이언트가 본 <code>baseVersion</code> 검사 + <code>(question_id, version)</code> 유니크 제약의 두 겹. 자동 재시도 대신 409 를 돌려주고, 화면은 쓰던 내용을 지우지 않은 채 최신 버전과 비교해 보여줌</dd>
+      <dt class="r">결과</dt><dd>5개 스레드 동시 저장 테스트(PostgreSQL 포함)에서 1건만 저장 · 나머지 409</dd>
+    </dl>
+  </div>
+
+  <div class="case">
+    <h3><span class="n">04</span>"현재 상태"로 세면 틀리는 통계</h3>
+    <dl class="psr">
+      <dt class="p">문제</dt><dd>현재 상태로 세면 면접까지 갔다가 떨어진 공고가 "불합격"으로만 잡혀 서류 통과율이 낮게 나옴. 결과 대기 중인 건을 분모에 넣으면 통과율이 실제보다 낮아짐</dd>
+      <dt class="s">해결</dt><dd>상태 이력에서 공고마다 "도달한 가장 높은 단계"를 JPQL 로 집계. 결과가 나온 건만 분모에 넣고 대기 건은 따로 표시, 10분 안에 되돌린 변경은 제외</dd>
+      <dt class="r">결과</dt><dd>퍼널 · 통과율 · 응답 기간이 실제 진행과 일치 · 통계 쿼리는 PostgreSQL 에서도 테스트</dd>
+    </dl>
+  </div>
+  <div class="foot"><span>HireTrack · 포트폴리오</span><span>6</span></div>
+</section>
+
+<!-- 7. 문제 해결 2 -->
+<section class="page">
+  <div class="case">
+    <h3><span class="n">05</span>크롬 확장 프로그램의 최소 권한</h3>
+    <dl class="psr">
+      <dt class="p">문제</dt><dd>서버 요청 방식은 JS 로 그려지는 페이지·로그인이 필요한 페이지를 못 읽음. 그렇다고 확장에 <code>&lt;all_urls&gt;</code> 권한과 웹앱과 같은 토큰을 주면 유출 시 피해가 큼</dd>
+      <dt class="s">해결</dt><dd><code>activeTab</code> 만 써서 아이콘을 누른 탭만 읽고, 렌더링된 HTML 을 <code>parse-html</code> 로 보내 <b>같은 파서 체인</b>이 처리. 확장 전용 토큰(<code>SCOPE_EXTENSION</code>)은 추출·등록만 가능, CORS 는 고정된 확장 ID 하나만, 본문은 3MB 상한</dd>
+      <dt class="r">결과</dt><dd>확장 토큰으로 목록 조회 시 403 · 다른 확장 출처는 CORS 거부 · 4MB 본문은 413 — 통합 테스트로 고정</dd>
+    </dl>
+  </div>
+
+  <div class="case">
+    <h3><span class="n">06</span>마감 알림 스케줄러의 중복 발송 · 시간대</h3>
+    <dl class="psr">
+      <dt class="p">문제</dt><dd>서버가 여러 대거나 스케줄러가 겹쳐 돌면 같은 메일이 두 번 나감. 서버가 UTC 면 D-day 가 하루 어긋남</dd>
+      <dt class="s">해결</dt><dd><code>(posting_id, remind_day)</code> 유니크 제약 + 발송 기록과 메일 발송을 한 트랜잭션으로 묶어 메일이 실패하면 기록도 롤백(다음 실행에 재시도). D-day 는 서울 날짜 기준, 사용자별로 하루 한 통에 모아 보냄</dd>
+      <dt class="r">결과</dt><dd>동시 실행에도 1통 · 발송 결과는 <code>hiretrack.reminders{result}</code> 지표로 관찰</dd>
+    </dl>
+  </div>
+
+  <div class="case">
+    <h3><span class="n">07</span>H2 에서는 통과하고 PostgreSQL 에서 깨지는 쿼리</h3>
+    <dl class="psr">
+      <dt class="p">문제</dt><dd>목록 검색에서 null 파라미터를 PostgreSQL 이 <code>bytea</code> 로 추론해 <code>varchar like bytea</code> 오류(500). H2 테스트는 모두 통과해 배포 리허설에서야 발견</dd>
+      <dt class="s">해결</dt><dd><code>cast(:x as String)</code> 로 타입 명시. Testcontainers 로 모든 API 통합 테스트를 실제 PostgreSQL 에서도 돌리도록 서브클래스 추가, 스키마는 Flyway 로 관리하고 Hibernate 는 검증만</dd>
+      <dt class="r">결과</dt><dd>같은 시나리오를 H2 · PostgreSQL 양쪽에서 실행 — 이후 동시성 버그(01)도 이 테스트가 잡음</dd>
+    </dl>
+  </div>
+
+  <div class="case">
+    <h3><span class="n">08</span>배포 리허설 · 자동 롤백 · 백업 복구</h3>
+    <dl class="psr">
+      <dt class="p">문제</dt><dd>배포 스크립트·백업이 "있기만" 하고 실제로 동작하는지 모름. 리허설에서 메일 미설정 시 헬스체크 DOWN → 배포가 매번 롤백, Nginx upstream 이름 충돌, 스크립트 CRLF 로 리눅스 실행 불가 발견</dd>
+      <dt class="s">해결</dt><dd>운영과 같은 이미지·compose·스크립트로 로컬 리허설. 메일은 health 에서 제외(지표로 관찰), upstream 이름 변경, LF 통일 + <code>.gitattributes</code>. 헬스체크 실패 시 직전 이미지로 자동 롤백</dd>
+      <dt class="r">결과</dt><dd>깨진 이미지 배포 → 자동 롤백 확인 · DB 볼륨 삭제 후 백업에서 복구한 데이터가 스냅샷과 완전히 동일</dd>
+    </dl>
+  </div>
+  <div class="foot"><span>HireTrack · 포트폴리오</span><span>7</span></div>
+</section>
+
+<!-- 8. 품질 · 향후 계획 -->
+<section class="page">
+  <h2 class="sec"><small>QUALITY</small>테스트 · CI/CD</h2>
+  <p class="lead">PR 과 main push 마다 테스트·빌드가 자동으로 돌고, 배포는 같은 검사를 다시 통과한 이미지만 서버로 나갑니다.</p>
+  <div class="flow" style="grid-template-columns:1fr 6mm 1fr 6mm 1fr 6mm 1fr">
+    <div class="step"><em>BACKEND</em><h4>테스트 166개</h4><p>단위 · 통합 · Testcontainers PostgreSQL · JaCoCo</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><em>FRONTEND</em><h4>lint · test · build</h4><p>ESLint · Vitest · tsc · Vite</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><em>E2E</em><h4>Playwright 4개</h4><p>가입 → 등록 → 드래그 → 통계, 제출본 고정, 가로 넘침</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><em>DEPLOY</em><h4>GHCR → SSH</h4><p>헬스체크 실패 시 직전 이미지로 롤백</p></div>
+  </div>
+  <table class="t">
+    <tr><th>백엔드 166개</th><td>도메인 규칙(상태 이력 · 되돌림 · 제출본 고정), 파서 체인 · SSRF, 자소서 동시 저장, 통계 집계, 알림 중복 방지, iCal 형식, 확장 토큰 범위 · CORS · 413, 동시 요청 회귀 — API 통합 테스트는 H2 · PostgreSQL 양쪽에서</td></tr>
+    <tr><th>프론트 10개</th><td>Vitest + Testing Library: 낙관적 업데이트 롤백, 글자 수 계산, 날짜 · D-day</td></tr>
+    <tr><th>E2E 4개</th><td>실제 서버 + 브라우저: 핵심 흐름, 마우스 드래그, 제출본 고정, 데스크톱 · 모바일 가로 넘침</td></tr>
+    <tr><th>운영</th><td>Actuator(별도 포트) · Micrometer 지표 · Sentry · 업타임 체크, <code>pg_dump</code> 백업과 복구 리허설 기록 (docs/OPERATIONS.md)</td></tr>
+  </table>
+
+  <h2 class="sec" style="margin-top:9mm;font-size:15pt"><small>NEXT</small>앞으로 개선할 점</h2>
+  <div class="grid2" style="margin-top:3mm">
+    <div class="box"><h3>운영</h3><ul>
+      <li>실제 서버 · 도메인에 배포하고 업타임 · 오류 지표 공개</li>
+      <li>서버 여러 대 대비: 스케줄러 ShedLock, 요청 제한 Redis 로</li></ul></div>
+    <div class="box"><h3>기능</h3><ul>
+      <li>실제 사람인 · 잡코리아 페이지로 파서 회귀 테스트 보강</li>
+      <li>크롬 웹 스토어 배포, 면접 준비 체크리스트</li></ul></div>
+  </div>
+
+  <div class="qr" style="margin-top:9mm">
+    <div style="font-size:24pt">🔗</div>
+    <div>
+      <b>저장소 · 시연 영상</b>
+      <p><code>github.com/cjsrudgh98-crypto/HireTrack</code></p>
+      <p style="color:var(--ink-2)">README 에 실행 방법(H2 로 바로 실행 / Docker), 화면, 시연 영상, 설계 문서가 있습니다.</p>
+    </div>
+  </div>
+  <div class="foot"><span>HireTrack · 포트폴리오</span><span>8</span></div>
+</section>
+
+</body>
+</html>

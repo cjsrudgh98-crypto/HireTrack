@@ -1,0 +1,19 @@
+# 로컬 개발: Docker 없이 바로 실행되도록 H2 파일 DB(PostgreSQL 호환 모드) + 같은 Flyway 마이그레이션
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./data/hiretrack;MODE=PostgreSQL}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  flyway:
+    # 1~3단계 동안 ddl-auto 로 만들어진 기존 로컬 DB 를 그대로 이어 쓰기 위한 설정:
+    # 이력 테이블이 없는 기존 DB 는 V3 까지 있는 것으로 간주(baseline)하고 V4 부터 적용한다.
+    # 빈 DB 에는 영향 없음(V1 부터 전부 실행).
+    baseline-on-migrate: true
+    baseline-version: 3
+
+jwt:
+  secret: ${JWT_SECRET:local-dev-secret-change-me-please-0123456789}
+
+app:
+  cors:
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGINS:chrome-extension://*}

@@ -1,0 +1,35 @@
+# 운영: PostgreSQL, 비밀값은 전부 환경변수(서버의 .env / GitHub Secrets). 기본값을 두지 않아 빠지면 기동 실패.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  flyway:
+    baseline-on-migrate: false
+
+jwt:
+  secret: ${JWT_SECRET}
+
+app:
+  cors:
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGINS}
+
+server:
+  # Nginx 가 붙여 주는 X-Forwarded-* 를 신뢰 (HTTPS 종료는 Nginx 에서)
+  forward-headers-strategy: native
+  shutdown: graceful
+
+# Actuator 는 별도 포트 — 외부에 공개하지 않고, Nginx 는 /health 만 이 포트의 health 로 넘긴다
+management:
+  server:
+    port: 9090
+  endpoint:
+    health:
+      show-details: never
+
+sentry:
+  environment: prod
+
+logging:
+  level:
+    root: INFO

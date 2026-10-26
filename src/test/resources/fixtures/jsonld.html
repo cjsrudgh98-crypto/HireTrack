@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!-- 회사 채용 페이지에 schema.org JobPosting 을 @graph 로 넣어둔 경우 (가상 회사). -->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Careers - ◇◇랩스</title>
+  <script type="application/ld+json">{ this is broken json </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {"@type": "WebSite", "name": "◇◇랩스 채용"},
+        {
+          "@type": ["JobPosting"],
+          "title": "Android 개발자",
+          "hiringOrganization": "◇◇랩스",
+          "employmentType": ["CONTRACTOR"],
+          "validThrough": "2026-11-05T15:30:00Z",
+          "jobLocationType": "TELECOMMUTE",
+          "qualifications": "<ul><li>Kotlin 실무 경험 3년 이상</li><li>Jetpack Compose 경험</li></ul>",
+          "description": "<p>긴 회사 소개...</p>"
+        }
+      ]
+    }
+  </script>
+</head>
+<body><h1>Android 개발자</h1></body>
+</html>

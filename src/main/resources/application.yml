@@ -1,0 +1,76 @@
+# 공통 설정. 환경별 값은 application-local.yml / application-prod.yml (SPRING_PROFILES_ACTIVE 로 선택, 기본 local)
+spring:
+  application:
+    name: hiretrack
+  profiles:
+    default: local
+  jpa:
+    hibernate:
+      # 스키마는 Flyway(db/migration)가 만들고, Hibernate 는 엔티티와 일치하는지 검증만 한다
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  # 메일 발송: SPRING_MAIL_HOST / SPRING_MAIL_USERNAME / SPRING_MAIL_PASSWORD 환경변수를 주면 SMTP 로 보낸다.
+  # (host 를 여기 빈 값으로 두면 메일 빈이 잘못 만들어지므로 일부러 적지 않는다. 미설정 시 로그로만 남김)
+  mail:
+    port: ${SPRING_MAIL_PORT:587}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 10000
+
+parse:
+  timeout: 5s
+  max-body-size: 2MB
+  rate-limit-per-minute: 10
+
+notification:
+  base-url: ${APP_BASE_URL:http://localhost:5173}
+  mail-from: ${MAIL_FROM:HireTrack <noreply@hiretrack.local>}
+  scheduler-enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-validity: ${JWT_VALIDITY:7d}
+  extension-token-validity: ${JWT_EXTENSION_VALIDITY:30d}
+
+app:
+  cors:
+    # 확장 프로그램 출처. 운영은 정확한 ID: chrome-extension://<32자 ID>
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGINS:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  health:
+    # 메일 서버 장애는 "서비스 불가"가 아니다 — health 에 넣으면 SMTP 문제로 배포가 롤백된다.
+    # 메일 발송 실패는 hiretrack.reminders{result=failed} 지표와 로그로 본다.
+    mail:
+      enabled: false
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+# 에러 추적. SENTRY_DSN 이 비어 있으면 아무것도 보내지 않는다.
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:local}
+  send-default-pii: false
+  traces-sample-rate: 0.0
+
+server:
+  port: 8080

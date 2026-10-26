@@ -1,0 +1,118 @@
+# PR·main push 마다 실행 — 모두 통과해야 머지 (Settings → Branches → main 보호 규칙에서 아래 job 들을 필수 체크로 지정)
+# deploy.yml 이 배포 전에 같은 검사를 재사용한다(workflow_call).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+concurrency:
+  # 재사용될 때 github.workflow 는 호출한 쪽(Deploy) 이름이라, main push 의 CI 와 서로 취소하지 않는다
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (unit · integration · Testcontainers PostgreSQL)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      # Testcontainers 는 러너의 Docker 로 PostgreSQL 컨테이너를 띄운다
+      - name: Build & test
+        run: ./mvnw -B verify
+      - name: Coverage summary
+        if: always()
+        run: |
+          if [ -f target/site/jacoco/jacoco.csv ]; then
+            awk -F, 'NR>1 {mi+=$4; ci+=$5; bm+=$6; bc+=$7; lm+=$8; lc+=$9}
+              END {printf "### 커버리지 (JaCoCo)\n| 라인 | 브랜치 | 명령어 |\n|---|---|---|\n| %.1f%% | %.1f%% | %.1f%% |\n",
+                   lc*100/(lm+lc), bc*100/(bm+bc), ci*100/(mi+ci)}' target/site/jacoco/jacoco.csv >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: backend-reports
+          path: |
+            target/site/jacoco/
+            target/surefire-reports/
+          retention-days: 7
+
+  frontend:
+    name: Frontend (lint · test · build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Package backend
+        run: ./mvnw -B -q package -DskipTests -Djacoco.skip=true
+      - name: Install & build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run build
+      # playwright.config.ts 의 webServer 가 jar(인메모리 H2)와 vite preview 를 띄운다
+      - name: Run E2E
+        working-directory: frontend
+        run: npx playwright test
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - name: Backend image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,mode=max,scope=app
+      - name: Web image
+        uses: docker/build-push-action@v7
+        with:
+          context: frontend
+          push: false
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web

@@ -1,0 +1,11 @@
+# 저장소는 LF 로 통일 (Windows 에서 편집해도 셸 스크립트가 리눅스 서버에서 깨지지 않도록)
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.png binary
+*.jar binary
+*.gif binary
+*.webm binary
+*.mp4 binary
+*.pdf binary
+*.jpg binary
+*.exe binary

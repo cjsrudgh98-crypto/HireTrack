@@ -1,0 +1,74 @@
+# ${DOMAIN} 은 컨테이너 시작 시 환경변수로 치환된다. (nginx 변수 $host 등은 그대로 남음)
+
+upstream app_api {
+    server app:8080;
+}
+
+# HTTP: Let's Encrypt 인증(ACME challenge)만 받고 나머지는 HTTPS 로
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${DOMAIN};
+
+    ssl_certificate     /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+
+    include /etc/nginx/snippets/security-headers.conf;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml text/calendar;
+
+    # 확장 프로그램이 보내는 HTML(최대 2MB) + JSON 여유
+    client_max_body_size 3m;
+
+    root /usr/share/nginx/html;
+
+    # 해시가 붙은 빌드 산출물은 오래 캐시
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        include /etc/nginx/snippets/security-headers.conf;
+    }
+
+    # SPA: 없는 경로는 index.html (React Router)
+    location / {
+        try_files $uri /index.html;
+        add_header Cache-Control "no-cache";
+        include /etc/nginx/snippets/security-headers.conf;
+    }
+
+    location /api/ {
+        proxy_pass http://app_api;
+        # Host 를 그대로 넘겨야 백엔드가 같은 출처로 판단한다(웹앱 요청에 CORS 검사가 걸리지 않음)
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+    }
+
+    location /swagger-ui/ { proxy_pass http://app_api; proxy_set_header Host $host; proxy_set_header X-Forwarded-Proto $scheme; }
+    location = /swagger-ui.html { proxy_pass http://app_api; proxy_set_header Host $host; proxy_set_header X-Forwarded-Proto $scheme; }
+    location /v3/api-docs { proxy_pass http://app_api; proxy_set_header Host $host; proxy_set_header X-Forwarded-Proto $scheme; }
+
+    # 외부 업타임 체크용. Actuator 는 별도 포트(9090)라 health 만 골라서 공개한다
+    location = /health {
+        proxy_pass http://app:9090/actuator/health;
+        access_log off;
+    }
+}

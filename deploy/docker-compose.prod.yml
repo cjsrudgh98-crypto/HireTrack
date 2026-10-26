@@ -1,0 +1,68 @@
+# 서버 한 대 운영 구성: Nginx(HTTPS·정적 파일·/api 프록시) + Spring Boot + PostgreSQL + certbot(인증서 자동 갱신)
+# 서버의 /opt/hiretrack 에 이 파일과 .env, scripts/ 를 두고 scripts/deploy.sh 로 배포한다.
+name: hiretrack
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hiretrack
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d hiretrack"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    # 포트를 호스트에 열지 않는다 — app 만 내부 네트워크로 접근
+
+  app:
+    image: ${IMAGE_PREFIX}/hiretrack-app:${TAG}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/hiretrack
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      APP_BASE_URL: https://${DOMAIN}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+    # 8080(API)·9090(Actuator) 모두 호스트에 공개하지 않는다. Nginx 만 접근
+
+  web:
+    image: ${IMAGE_PREFIX}/hiretrack-web:${TAG}
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+
+  # 12시간마다 갱신 시도 (만료 30일 전부터 실제 갱신). 새 인증서 반영은 매일 nginx reload (init-letsencrypt.sh 안내의 cron)
+  certbot:
+    image: certbot/certbot:latest
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done'
+
+volumes:
+  db-data:

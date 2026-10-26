@@ -1,0 +1,59 @@
+:root {
+  --bg: #ffffff;
+  --surface-2: #eef0f3;
+  --border: #e1e4e8;
+  --text: #1c2026;
+  --text-2: #5b6470;
+  --primary: #3758f9;
+  --danger: #e5484d;
+  --ok: #16a34a;
+  --warn: #d97706;
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif;
+  font-size: 13px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1d23;
+    --surface-2: #23272f;
+    --border: #2e333c;
+    --text: #e8eaed;
+    --text-2: #a7aeb8;
+    --primary: #5b78ff;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+/* form { display: flex } 같은 규칙이 hidden 속성을 덮어쓰지 않도록 */
+[hidden] { display: none !important; }
+body { width: 360px; margin: 0; padding: 12px 14px 14px; background: var(--bg); color: var(--text); }
+.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.brand { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; }
+.mark { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: var(--primary); color: #fff; font-size: 12px; }
+.top-right { display: flex; gap: 8px; align-items: center; max-width: 220px; }
+.muted { color: var(--text-2); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+p.muted { white-space: normal; }
+form { display: flex; flex-direction: column; gap: 8px; }
+label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; color: var(--text-2); font-size: 12px; }
+input, select, textarea {
+  font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px;
+}
+input[readonly] { background: var(--surface-2); color: var(--text-2); }
+textarea { resize: vertical; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+button { font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 7px 10px; font-weight: 600; }
+button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+button:disabled { opacity: 0.6; cursor: default; }
+button.link { border: 0; padding: 0; background: none; color: var(--primary); font-size: 12px; }
+.status { font-size: 12px; margin-bottom: 8px; min-height: 0; }
+.status:empty { display: none; }
+.status-info { color: var(--text-2); }
+.status-ok { color: var(--ok); }
+.status-error { color: var(--danger); }
+label.auto input, label.auto select, label.auto textarea { background: color-mix(in srgb, var(--primary) 8%, var(--bg)); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+label.missing::after { content: '⚠ 직접 입력 필요'; color: var(--warn); font-size: 11px; order: -1; align-self: flex-end; margin-top: -16px; }
+.saved { padding: 12px; border-radius: 8px; background: color-mix(in srgb, var(--ok) 12%, var(--bg)); font-weight: 600; }
+.saved a { color: var(--primary); }
+.settings { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 8px; }
+.settings summary { cursor: pointer; color: var(--text-2); font-size: 12px; }
+.settings form { margin-top: 8px; }
