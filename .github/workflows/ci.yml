@@ -65,14 +65,7 @@ jobs:
         if: always()
         run: |
           if [ -f coverage/coverage-summary.json ]; then
-            node -e '
-              const t = require("./coverage/coverage-summary.json").total;
-              const p = (k) => t[k].pct.toFixed(1) + "%";
-              console.log("### 프론트 커버리지 (Vitest · v8)");
-              console.log("| 라인 | 브랜치 | 함수 | 구문 |");
-              console.log("|---|---|---|---|");
-              console.log(`| ${p("lines")} | ${p("branches")} | ${p("functions")} | ${p("statements")} |`);
-            ' >> "$GITHUB_STEP_SUMMARY"
+            node scripts/coverage-summary.mjs >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/upload-artifact@v7
         if: always()
