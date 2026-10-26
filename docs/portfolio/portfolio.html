@@ -254,7 +254,7 @@
       <h4>서버 (Docker Compose)</h4>
       <div class="server-layers">
         <div class="node"><b>Nginx</b>HTTPS(Let's Encrypt) · 정적 파일 · 보안 헤더 · <code>/api</code> 프록시 · <code>/health</code> 만 Actuator 로</div>
-        <div class="node"><b>Security Filter Chain</b>JWT(APP / EXTENSION 범위) · 요청 크기 제한 · CORS · JSON 401/403</div>
+        <div class="node"><b>Security</b>JWT(APP / EXTENSION 범위) · 로그인 시도 제한(이메일 5회 · IP 분당 20회) · 요청 크기 제한 · CORS</div>
         <div class="node"><b>Controller · Service</b>공고 · 상태 이력 · 파서 체인 · 자소서 버전 · 템플릿 · 통계 · 면접 · 캘린더 · 알림 — 44개 엔드포인트</div>
         <div class="node"><b>도메인 이벤트</b>첫 지원 → 제출본 고정 · 공고 삭제 → 자소서·면접 정리 (같은 트랜잭션)</div>
         <div class="node"><b>Scheduler · Metrics</b>마감 알림 메일 · Micrometer 지표(파서 실패율, 알림 결과) · Sentry(선택)</div>
@@ -393,7 +393,7 @@
     <div class="step"><em>DEPLOY</em><h4>GHCR → SSH</h4><p>헬스체크 실패 시 직전 이미지로 롤백</p></div>
   </div>
   <table class="t">
-    <tr><th>백엔드 177개</th><td>도메인 규칙(상태 이력 · 되돌림 · 제출본 고정), 파서 체인 · SSRF, 자소서 동시 저장, 통계 집계, 알림 중복 방지, iCal 형식, 확장 토큰 범위 · CORS · 413, 동시 요청 회귀 — API 통합 테스트는 H2 · PostgreSQL 양쪽에서</td></tr>
+    <tr><th>백엔드 177개</th><td>도메인 규칙(상태 이력 · 되돌림 · 제출본 고정), 파서 체인 · SSRF, 자소서 동시 저장, 통계 집계, 알림 중복 방지, iCal 형식, 확장 토큰 범위 · CORS · 413, 로그인 잠금, 동시 요청 회귀 — API 통합 테스트는 H2 · PostgreSQL 양쪽에서</td></tr>
     <tr><th>프론트 10개</th><td>Vitest + Testing Library: 낙관적 업데이트 롤백, 글자 수 계산, 날짜 · D-day</td></tr>
     <tr><th>E2E 4개</th><td>실제 서버 + 브라우저: 핵심 흐름, 마우스 드래그, 제출본 고정, 데스크톱 · 모바일 가로 넘침</td></tr>
     <tr><th>운영</th><td>Actuator(별도 포트) · Micrometer 지표 · Sentry · 업타임 체크, <code>pg_dump</code> 백업과 복구 리허설 기록 (docs/OPERATIONS.md)</td></tr>

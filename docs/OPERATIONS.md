@@ -55,6 +55,7 @@ main ─▶ deploy.yml ─▶ ci.yml 재사용 ─▶ 이미지 빌드·GHCR 푸
 | 예외 | `SENTRY_DSN` 설정 시 Sentry 로 전송 (비우면 비활성). 개인정보 미전송(`send-default-pii: false`) |
 | 파서 깨짐 | 지표 `hiretrack.parser.results{source,result}` / 로그 `parser-failure source=SARAMIN failureRate=…` |
 | 알림 발송 | 지표 `hiretrack.reminders{result=sent\|failed\|duplicate}` / 로그 `reminder-sent`, `reminder-failed` |
+| 비밀번호 대입 시도 | 로그 `login-locked`(이메일 해시), `auth-rate-limited ip=…` — 같은 IP 가 계속 보이면 방화벽에서 차단 |
 | 지표 조회 | Actuator 는 외부 비공개(9090) → `docker compose exec app wget -qO- localhost:9090/actuator/metrics/hiretrack.reminders` |
 
 > 메일 서버 장애는 health 에 넣지 않았습니다. 넣으면 SMTP 문제로 앱 전체가 DOWN 이 되어 배포가 롤백됩니다(리허설에서 실제로 발생).
@@ -96,5 +97,5 @@ cd /opt/hiretrack
 ## 다중 서버로 갈 때
 
 - 스케줄러: ShedLock(JDBC)으로 한 인스턴스만 실행 (지금도 유니크 제약으로 중복 발송은 없음)
-- 추출 요청 제한(`ParseRateLimiter`): 메모리 → Redis
+- 추출 요청 제한(`ParseRateLimiter`)·로그인 시도 제한(`LoginThrottle`): 메모리 → Redis
 - 통계: 사용자별 짧은 캐시 + 상태 변경 이벤트로 무효화

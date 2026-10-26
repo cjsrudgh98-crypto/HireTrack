@@ -363,7 +363,7 @@ erDiagram
 
 | 구분 | 내용 |
 |---|---|
-| **백엔드** | JUnit 5 테스트 **177개**, 라인 커버리지 **92.4%**(JaCoCo). 도메인 규칙(상태 이력 · 되돌림 · 제출본 고정), 파서 체인 · SSRF, 자소서 동시 저장, 통계 집계, 알림 중복 방지, iCal 형식, 확장 토큰 범위 · CORS · 413, 동시 요청 회귀. **API 통합 테스트는 H2와 PostgreSQL(Testcontainers) 양쪽에서** 실행 |
+| **백엔드** | JUnit 5 테스트 **177개**, 라인 커버리지 **92.4%**(JaCoCo). 도메인 규칙(상태 이력 · 되돌림 · 제출본 고정), 파서 체인 · SSRF, 자소서 동시 저장, 통계 집계, 알림 중복 방지, iCal 형식, 확장 토큰 범위 · CORS · 413, 로그인 잠금, 동시 요청 회귀, 실제 공고 구조를 따른 파서 픽스처. **API 통합 테스트는 H2와 PostgreSQL(Testcontainers) 양쪽에서** 실행 |
 | **프론트엔드** | Vitest + Testing Library: 낙관적 업데이트 롤백, 글자 수 계산, 날짜 · D-day |
 | **E2E** | Playwright **4개**: 가입 → 등록 → 상태 변경 → 통계, 마우스 드래그 후 새로고침 유지, 지원 시 제출본 고정, 데스크톱 · 모바일 가로 넘침 검사 |
 | **CI** ([`ci.yml`](.github/workflows/ci.yml)) | PR과 main push마다 ① 백엔드(Testcontainers 포함) ② 프론트 lint · test · build ③ E2E ④ Docker 이미지 빌드 |
@@ -431,8 +431,8 @@ cp .env.example .env              # 값 채우기 (아래 표) · chmod 600 .env
 ```
 HireTrack
 ├── src/main/java/com/hiretrack/
-│   ├── common/            # 보안(JWT · 범위 토큰 · CORS · 요청 크기 제한), 에러 응답, 시간대, Swagger
-│   ├── user/              # 가입 · 로그인 · 확장 프로그램 로그인
+│   ├── common/            # 보안(JWT · 범위 토큰 · CORS · 요청 크기 제한 · 요청 수 카운터), 에러 응답, 시간대, Swagger
+│   ├── user/              # 가입 · 로그인 · 확장 프로그램 로그인 · 로그인 시도 제한
 │   ├── posting/           # 공고 · 지원 · 상태 이력 · 도메인 이벤트
 │   ├── parse/             # 파서 체인(사람인 · 잡코리아 · JSON-LD · OG), SSRF 방어, 요청 제한, 실패율 지표
 │   ├── essay/             # 문항 · 버전 · 임시저장 · 제출본 고정 · 템플릿 · 검색
