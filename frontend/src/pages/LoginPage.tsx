@@ -63,9 +63,15 @@ export function LoginPage() {
             minLength={mode === 'signup' ? 8 : undefined}
             maxLength={64}
             required
+            aria-describedby={mode === 'signup' ? 'password-hint' : undefined}
           />
-          {mode === 'signup' && <small className="hint">8자 이상 입력해 주세요.</small>}
         </label>
+        {/* 안내 문구를 label 밖에 둬야 입력칸 이름이 "비밀번호"로만 읽힌다(스크린 리더) */}
+        {mode === 'signup' && (
+          <small id="password-hint" className="hint">
+            8자 이상 입력해 주세요.
+          </small>
+        )}
 
         {error && <p className="form-error">{error}</p>}
 

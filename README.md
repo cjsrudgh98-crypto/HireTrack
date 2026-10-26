@@ -364,7 +364,7 @@ erDiagram
 | 구분 | 내용 |
 |---|---|
 | **백엔드** | JUnit 5 테스트 **177개**, 라인 커버리지 **92.4%**(JaCoCo). 도메인 규칙(상태 이력 · 되돌림 · 제출본 고정), 파서 체인 · SSRF, 자소서 동시 저장, 통계 집계, 알림 중복 방지, iCal 형식, 확장 토큰 범위 · CORS · 413, 로그인 잠금, 동시 요청 회귀, 실제 공고 구조를 따른 파서 픽스처. **API 통합 테스트는 H2와 PostgreSQL(Testcontainers) 양쪽에서** 실행 |
-| **프론트엔드** | Vitest + Testing Library: 낙관적 업데이트 롤백, 글자 수 계산, 날짜 · D-day |
+| **프론트엔드** | Vitest + Testing Library **44개**: 자기소개서 편집기(1초 멈추면 임시저장 · 실패 표시, 버전 저장 시 기준 버전 전송, 409 충돌 시 쓰던 내용 유지, 제출본 읽기 전용, 글자 수 초과, 템플릿 출처), 로그인(토큰 저장 · 잠금 안내 · 서버 장애 때 토큰 유지), API 클라이언트(401 자동 로그아웃 · 네트워크 오류), 면접 등록 후 상태 이동 확인, 칸반 카드(D-day · 지난 공고), URL 추출 폼, 낙관적 업데이트 롤백, 글자 수 · 날짜 |
 | **E2E** | Playwright **4개**: 가입 → 등록 → 상태 변경 → 통계, 마우스 드래그 후 새로고침 유지, 지원 시 제출본 고정, 데스크톱 · 모바일 가로 넘침 검사 |
 | **CI** ([`ci.yml`](.github/workflows/ci.yml)) | PR과 main push마다 ① 백엔드(Testcontainers 포함) ② 프론트 lint · test · build ③ E2E ④ Docker 이미지 빌드 |
 | **CD** ([`deploy.yml`](.github/workflows/deploy.yml)) | CI 재검증 → GHCR 이미지 푸시(태그 = 커밋 SHA) → SSH로 `deploy.sh` → 헬스체크 실패 시 직전 이미지로 롤백 (`DEPLOY_ENABLED` 변수로 켬) |
