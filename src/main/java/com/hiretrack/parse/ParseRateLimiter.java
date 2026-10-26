@@ -2,16 +2,12 @@ package com.hiretrack.parse;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
 import com.hiretrack.common.error.BusinessException;
 import com.hiretrack.common.error.ErrorCode;
+import com.hiretrack.common.security.SlidingWindowCounter;
 
 /**
  * 사용자당 분당 추출 요청 수 제한(슬라이딩 윈도). 대상 사이트에 부담을 주지 않기 위한 장치.
@@ -20,9 +16,7 @@ import com.hiretrack.common.error.ErrorCode;
 @Component
 public class ParseRateLimiter {
 
-    private static final Duration WINDOW = Duration.ofMinutes(1);
-
-    private final Map<Long, Deque<Instant>> requests = new ConcurrentHashMap<>();
+    private final SlidingWindowCounter<Long> requests = new SlidingWindowCounter<>(Duration.ofMinutes(1));
     private final int limit;
     private final Clock clock;
 
@@ -32,16 +26,8 @@ public class ParseRateLimiter {
     }
 
     public void acquire(Long userId) {
-        Instant now = clock.instant();
-        Deque<Instant> window = requests.computeIfAbsent(userId, id -> new ArrayDeque<>());
-        synchronized (window) {
-            while (!window.isEmpty() && !window.peekFirst().isAfter(now.minus(WINDOW))) {
-                window.pollFirst();
-            }
-            if (window.size() >= limit) {
-                throw new BusinessException(ErrorCode.TOO_MANY_REQUESTS);
-            }
-            window.addLast(now);
+        if (!requests.tryAcquire(userId, limit, clock.instant())) {
+            throw new BusinessException(ErrorCode.TOO_MANY_REQUESTS);
         }
     }
 }

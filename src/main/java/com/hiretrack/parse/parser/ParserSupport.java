@@ -56,6 +56,29 @@ public final class ParserSupport {
         return null;
     }
 
+    /**
+     * 채용 사이트 메타 설명의 "경력:신입, 학력:대졸, 마감일:2026-07-27" 처럼 "항목 : 값" 이 쉼표로 이어진 형식에서
+     * 원하는 항목의 값. 제목에 쉼표가 들어 있어도 항목 이름이 정확히 같은 조각만 보므로 섞이지 않는다.
+     */
+    public static String summaryValue(String summary, String key) {
+        if (summary == null) return null;
+        for (String part : summary.split(",")) {
+            int colon = part.indexOf(':');
+            if (colon > 0 && part.substring(0, colon).trim().equals(key)) return clean(part.substring(colon + 1));
+        }
+        return null;
+    }
+
+    /** 메타 설명에서 자격요건으로 쓸 항목들을 "항목: 값" 줄로 모은다 */
+    public static String summaryRequirements(String summary, String... keys) {
+        StringBuilder lines = new StringBuilder();
+        for (String key : keys) {
+            String value = summaryValue(summary, key);
+            if (value != null) lines.append(lines.isEmpty() ? "" : "\n").append(key).append(": ").append(value);
+        }
+        return lines.isEmpty() ? null : lines.toString();
+    }
+
     public static EmploymentType employmentType(String text) {
         if (text == null) return null;
         if (text.contains("정규직")) return EmploymentType.FULL_TIME;

@@ -66,6 +66,34 @@ class ParsingServiceTest {
     }
 
     @Test
+    void 잡코리아_현재_화면은_전용_파서의_메타_정보와_JSON_LD의_근무지_고용형태를_합쳐_모든_칸을_채운다() {
+        page = Fixtures.load("jobkorea-current.html", "https://www.jobkorea.co.kr/Recruit/GI_Read/3");
+
+        ParseResponse response = service.parse(USER_ID, "https://www.jobkorea.co.kr/Recruit/GI_Read/3");
+
+        assertThat(response.success()).isTrue();
+        assertThat(response.source()).isEqualTo(ParseSource.JOBKOREA);
+        assertThat(response.data().location()).isEqualTo("서울 송파구 법원로 100");
+        assertThat(response.data().employmentType()).isEqualTo(EmploymentType.FULL_TIME);
+        assertThat(response.data().requirements()).isEqualTo("경력: 경력 3년이상\n학력: 대졸↑");
+        assertThat(response.missingFields()).isEmpty();
+        assertThat(stats.failures(ParseSource.JOBKOREA)).isZero();
+    }
+
+    @Test
+    void 사람인_껍데기_페이지는_근무지역과_고용형태만_비어_있다고_알려준다() {
+        page = Fixtures.load("saramin-shell.html", "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=1");
+
+        ParseResponse response = service.parse(USER_ID, "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=1");
+
+        assertThat(response.success()).isTrue();
+        assertThat(response.source()).isEqualTo(ParseSource.SARAMIN);
+        assertThat(response.data().deadline()).isEqualTo(java.time.LocalDate.of(2026, 11, 20));
+        assertThat(response.missingFields()).containsExactlyInAnyOrder("location", "employmentType");
+        assertThat(stats.failures(ParseSource.SARAMIN)).isZero();
+    }
+
+    @Test
     void 구조화_데이터가_없으면_Open_Graph로_제목만이라도_채운다() {
         page = Fixtures.load("opengraph.html", "https://careers.example.com/fe");
 

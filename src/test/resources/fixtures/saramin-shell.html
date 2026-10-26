@@ -1,0 +1,30 @@
+<!doctype html>
+<!--
+  사람인 공고 상세를 서버가 한 번 요청했을 때 받는 "껍데기" 페이지 (2026-10 실제 페이지 구조를 따라 만든 가짜 데이터).
+  본문(요약 표·근무지역·고용형태)은 자바스크립트가 /zf_user/jobs/relay/view-ajax 로 나중에 불러오므로 여기에는 없다.
+  쓸 수 있는 정보는 og:title "[회사] 제목 - 사람인" 과 메타 설명의 "경력:… 학력:… 마감일:YYYY-MM-DD" 뿐이다.
+-->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>[○○소프트] 백엔드 개발자 (Spring, 3년 이상) - 사람인</title>
+  <meta name="description" content="○○소프트, 백엔드 개발자 (Spring, 3년 이상), 경력:경력 3년↑, 학력:대졸(4년제)↑, 면접 후 결정, 마감일:2026-11-20, 홈페이지:https://example.com/" >
+  <meta name="keywords" content="Java, Spring, 백엔드" >
+  <meta property="og:description" content="○○소프트, 백엔드 개발자 (Spring, 3년 이상), 경력:경력 3년↑, 학력:대졸(4년제)↑, 면접 후 결정, 마감일:2026-11-20, 홈페이지:https://example.com/" >
+  <meta property="og:title" content="[○○소프트] 백엔드 개발자 (Spring, 3년 이상) - 사람인" >
+  <meta property="og:site_name" content="사람인" >
+  <meta property="og:type" content="website" >
+</head>
+<body>
+  <div class="jview_floating jview">
+    <div class="inner">
+      <div class="jv_header_float"></div>
+      <div class="jv_util"><div class="links login"><a href="/zf_user/auth">로그인</a></div></div>
+    </div>
+  </div>
+  <div class="wrap_jview" id="content"></div>
+  <script>
+    var jv_options = { 'requestUrl' : '/zf_user/jobs/relay/view-ajax', 'recruit_idxs' : [{"rec_idx":"1"}] };
+  </script>
+</body>
+</html>

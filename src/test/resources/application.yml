@@ -9,6 +9,13 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
+auth:
+  login:
+    max-failures: 5
+    lock-duration: 15m
+    # 통합 테스트는 모두 같은 IP(127.0.0.1)에서 가입하므로 넉넉하게
+    ip-requests-per-minute: 10000
+
 parse:
   timeout: 5s
   max-body-size: 2MB

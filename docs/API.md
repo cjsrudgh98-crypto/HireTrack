@@ -1,6 +1,6 @@
 # API 요약
 
-전체 명세(요청·응답 스키마)는 실행 중인 서버의 **Swagger UI** `/swagger-ui.html` 에서 볼 수 있습니다(코드에서 자동 생성).
+전체 명세(요청·응답 스키마)는 로컬 서버의 **Swagger UI** `http://localhost:8080/swagger-ui.html` 에서 볼 수 있습니다(코드에서 자동 생성). 운영(`prod` 프로필)에서는 꺼 둡니다.
 
 공통: `Authorization: Bearer {token}`, JSON. 에러는 항상 `{"code": "...", "message": "..."}`.
 
@@ -61,4 +61,4 @@
 
 `400 INVALID_INPUT` / `INVALID_URL` · `401 UNAUTHORIZED` / `INVALID_CREDENTIALS` · `403 FORBIDDEN` ·
 `404 POSTING_NOT_FOUND` / `QUESTION_NOT_FOUND` / `ANSWER_NOT_FOUND` / `TEMPLATE_NOT_FOUND` / `INTERVIEW_NOT_FOUND` / `CALENDAR_NOT_FOUND` ·
-`405 METHOD_NOT_ALLOWED` · `409 EMAIL_DUPLICATED` / `VERSION_CONFLICT` / `ANSWER_LOCKED` / `SUBMIT_NOT_ALLOWED` / `CONFLICT`(동시 요청 충돌, 다시 시도) · `413 PAYLOAD_TOO_LARGE` · `415 UNSUPPORTED_MEDIA_TYPE` · `429 TOO_MANY_REQUESTS`
+`405 METHOD_NOT_ALLOWED` · `409 EMAIL_DUPLICATED` / `VERSION_CONFLICT` / `ANSWER_LOCKED` / `SUBMIT_NOT_ALLOWED` / `CONFLICT`(동시 요청 충돌, 다시 시도) · `413 PAYLOAD_TOO_LARGE` · `415 UNSUPPORTED_MEDIA_TYPE` · `429 TOO_MANY_REQUESTS` / `LOGIN_LOCKED`(이메일당 5회 실패 시 15분)

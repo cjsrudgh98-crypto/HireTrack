@@ -23,6 +23,12 @@ spring:
       mail.smtp.connectiontimeout: 5000
       mail.smtp.timeout: 10000
 
+auth:
+  login:
+    max-failures: 5
+    lock-duration: 15m
+    ip-requests-per-minute: 20
+
 parse:
   timeout: 5s
   max-body-size: 2MB

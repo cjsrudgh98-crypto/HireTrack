@@ -7,6 +7,8 @@ import static com.hiretrack.parse.parser.ParserSupport.labeledValue;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,12 +20,18 @@ import com.hiretrack.parse.ParsedPosting;
 
 /**
  * 잡코리아 공고 상세(Recruit/GI_Read/...) 파서.
- * 제목 영역(.sumTit)의 회사명(.coName)·제목과 요약 표(.tbRow, .tbList)의 dt/dd, 마감일(.tbTime)을 읽는다.
- * 화면을 자바스크립트로 그리는 신규 페이지는 여기서 비어 있게 나오고, 뒤의 JSON-LD 파서가 채운다.
+ * <ol>
+ *   <li>예전 화면: 제목 영역(.sumTit)의 회사명(.coName)·제목과 요약 표(.tbRow, .tbList)의 dt/dd, 마감일(.tbTime)</li>
+ *   <li>현재 화면(2026-10 확인): 요약 표가 없다. og:title "회사 채용 - 제목 | 잡코리아" 와
+ *       메타 설명 "경력 : …, 학력 : …, 마감일 : YYYY.MM.DD" 로 빈 칸을 채운다.
+ *       근무지·고용형태는 페이지의 JSON-LD(JobPosting)에 있어서 뒤의 JSON-LD 파서가 채운다.</li>
+ * </ol>
  */
 @Component
 @Order(20)
 public class JobKoreaParser implements PostingParser {
+
+    private static final Pattern OG_TITLE = Pattern.compile("^(.+?)\\s+채용\\s+-\\s+(.+?)(?:\\s*\\|\\s*잡코리아)?$");
 
     private final Clock clock;
 
@@ -59,7 +67,25 @@ public class JobKoreaParser implements PostingParser {
                 labeledValue(root, "근무지역", "지역", "근무지"),
                 ParserSupport.employmentType(labeledValue(root, "고용형태", "근무형태")),
                 ParserSupport.deadline(deadlineText, today),
-                requirements(root));
+                requirements(root))
+                .fillFrom(fromMeta(document, today));
+    }
+
+    private static ParsedPosting fromMeta(Document document, LocalDate today) {
+        String company = null;
+        String title = null;
+        String ogTitle = ParserSupport.meta(document, "og:title");
+        if (ogTitle != null) {
+            Matcher m = OG_TITLE.matcher(ogTitle);
+            if (m.matches()) {
+                company = clean(m.group(1));
+                title = clean(m.group(2));
+            }
+        }
+        String summary = ParserSupport.meta(document, "description");
+        return new ParsedPosting(company, title, null, null,
+                ParserSupport.deadline(ParserSupport.summaryValue(summary, "마감일"), today),
+                ParserSupport.summaryRequirements(summary, "경력", "학력"));
     }
 
     private static String requirements(Element root) {

@@ -130,6 +130,27 @@ class PostingApiIntegrationTest {
     }
 
     @Test
+    void 비밀번호를_5번_틀리면_맞는_비밀번호로도_잠시_로그인할_수_없다() throws Exception {
+        String email = "lock-" + UUID.randomUUID() + "@test.com";
+        mockMvc.perform(post("/api/auth/signup").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + email + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isCreated());
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"email\":\"" + email + "\",\"password\":\"wrong-password\"}"))
+                    .andExpect(status().isUnauthorized());
+        }
+        // 대소문자를 바꿔도 같은 계정으로 센다
+        mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + email.toUpperCase() + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.code").value("LOGIN_LOCKED"));
+        mockMvc.perform(post("/api/auth/extension/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + email + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isTooManyRequests());
+    }
+
+    @Test
     void 같은_공고에_동시에_상태를_바꿔도_이력이_이어진다() throws Exception {
         String token = signup();
         long id = createPosting(token);

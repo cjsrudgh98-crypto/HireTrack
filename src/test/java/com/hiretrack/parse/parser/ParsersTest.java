@@ -47,6 +47,34 @@ class ParsersTest {
     }
 
     @Test
+    void 사람인_실제_페이지처럼_본문이_없는_껍데기면_메타_태그로_회사_제목_마감일_경력_학력을_채운다() {
+        var doc = Fixtures.load("saramin-shell.html", "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=1");
+
+        ParsedPosting parsed = new SaraminParser(Fixtures.CLOCK).parse(doc);
+
+        assertThat(parsed.company()).isEqualTo("○○소프트");
+        // 제목 안의 쉼표 때문에 메타 설명을 쉼표로 나눠도 항목이 섞이지 않아야 한다
+        assertThat(parsed.title()).isEqualTo("백엔드 개발자 (Spring, 3년 이상)");
+        assertThat(parsed.deadline()).isEqualTo(LocalDate.of(2026, 11, 20));
+        assertThat(parsed.requirements()).isEqualTo("경력: 경력 3년↑\n학력: 대졸(4년제)↑");
+        // 근무지역·고용형태는 껍데기에 없다 — 확장 프로그램(브라우저에 그려진 화면)에서만 채워진다
+        assertThat(parsed.location()).isNull();
+        assertThat(parsed.employmentType()).isNull();
+    }
+
+    @Test
+    void 잡코리아_현재_화면은_요약_표가_없어도_메타_태그로_회사_제목_마감일_경력_학력을_채운다() {
+        var doc = Fixtures.load("jobkorea-current.html", "https://www.jobkorea.co.kr/Recruit/GI_Read/3");
+
+        ParsedPosting parsed = new JobKoreaParser(Fixtures.CLOCK).parse(doc);
+
+        assertThat(parsed.company()).isEqualTo("☆☆시스템");
+        assertThat(parsed.title()).isEqualTo("백엔드 개발자 채용");
+        assertThat(parsed.deadline()).isEqualTo(LocalDate.of(2026, 11, 15));
+        assertThat(parsed.requirements()).isEqualTo("경력: 경력 3년이상\n학력: 대졸↑");
+    }
+
+    @Test
     void 자바스크립트로_그리는_페이지는_전용_파서가_빈_결과를_낸다() {
         var doc = Fixtures.load("jobkorea-js-rendered.html", "https://www.jobkorea.co.kr/Recruit/GI_Read/2");
 

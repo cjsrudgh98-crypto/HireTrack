@@ -27,6 +27,13 @@ management:
     health:
       show-details: never
 
+# API 문서(Swagger)는 로컬에서만 연다 — 운영에서 엔드포인트 목록과 스키마를 공개하지 않는다
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
 sentry:
   environment: prod
 
