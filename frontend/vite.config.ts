@@ -23,5 +23,15 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}'],
     // 날짜 계산 테스트가 실행 환경 시간대에 흔들리지 않도록 서비스 기준 시간대로 고정
     env: { TZ: 'Asia/Seoul' },
+    // npm run test:coverage → coverage/index.html (CI 는 요약을 Job Summary 에 남기고 HTML 을 아티팩트로 올린다)
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'src/main.tsx', 'src/types.ts', 'src/vite-env.d.ts'],
+      reporter: ['text-summary', 'html', 'json-summary'],
+      // 지금 수치보다 조금 낮게 둔 하한 — 테스트 없이 코드만 늘면 CI 가 실패한다(테스트를 늘리면 함께 올린다).
+      // 화면 단위(pages/*)는 Playwright E2E 가 실제 브라우저로 확인하므로 여기 수치에는 잡히지 않는다.
+      thresholds: { lines: 44, statements: 43, branches: 40, functions: 32 },
+    },
   },
 });

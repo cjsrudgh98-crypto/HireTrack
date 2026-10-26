@@ -63,3 +63,4 @@ docs/node_modules/
 
 # 빌드 산출물
 *.tsbuildinfo
+frontend/coverage/
